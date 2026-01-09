@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>We Still Debug Like It’s the 1980s</title>
+</head>
+<body>
+
+<h1>We Still Debug Like It’s the 1980s</h1>
+
+<p><em>
+What if debugging was querying execution instead of stepping through it?
+</em></p>
+
+<hr>
+
+<p>
+Most modern debuggers still revolve around a single primitive: stepping.
+Step into. Step over. Step out. Advance one line at a time and watch the
+program unfold.
+</p>
+
+<p>
+This interaction model feels natural largely because it is familiar. But it
+exists for historical reasons, not because it matches how humans reason about
+bugs.
+</p>
+
+<h2>Stepping made sense when computation was expensive</h2>
+
+<p>
+Early debuggers were designed under severe constraints: slow terminals, limited
+memory, and linear execution models. Inspecting state was costly, and programs
+were small enough that stepping through them line by line was often feasible.
+</p>
+
+<p>
+In that environment, a debugger that advanced execution incrementally and
+showed you “what happens next” was a reasonable abstraction.
+</p>
+
+<p>
+Those constraints no longer apply.
+</p>
+
+<h2>Most bugs are found by recognizing state, not time</h2>
+
+<p>
+In practice, bugs are rarely discovered by watching time pass. They’re
+discovered when a specific state appears:
+</p>
+
+<ul>
+  <li>a variable becomes <code>None</code></li>
+  <li>a function returns an unexpected value</li>
+  <li>execution reaches a place it shouldn’t</li>
+  <li>a call happens from the wrong context</li>
+</ul>
+
+<p>
+When debugging, the question is rarely “what happens next?” It is usually
+something closer to “when does <em>this</em> happen?”
+</p>
+
+<p>
+Stepping forces the programmer to translate that question into a sequence of
+manual actions: step, inspect, step, inspect, repeat. The debugger exposes time,
+even when time is not the thing we care about.
+</p>
+
+<h2>Stepping is a leaky abstraction</h2>
+
+<p>
+This creates friction because stepping exposes an implementation detail of
+execution rather than the intent of the investigation.
+</p>
+
+<p>
+Consider the difference between these two mental models:
+</p>
+
+<ul>
+  <li>“Advance one line at a time until something looks wrong.”</li>
+  <li>“Stop when this condition becomes true.”</li>
+</ul>
+
+<p>
+The second model is declarative. It describes a property of program state,
+independent of how many lines or frames it takes to get there.
+</p>
+
+<p>
+Most debuggers support only the first model.
+</p>
+
+<h2>What if debugging was querying execution?</h2>
+
+<p>
+An alternative approach is to treat debugging as querying execution rather than
+manually driving it.
+</p>
+
+<p>
+Instead of repeatedly stepping and checking, you describe the state you are
+interested in, and let the debugger advance execution until that description
+matches reality.
+</p>
+
+<p>
+For example:
+</p>
+
+<ul>
+  <li>Stop when a function returns <code>None</code></li>
+  <li>But only if it was called from a specific helper</li>
+  <li>And only on a return event, not an exception</li>
+</ul>
+
+<p>
+Expressed as a predicate over execution state, that might look like:
+</p>
+
+<pre><code>
+(_event_ == "return")
+and (_return_ is None)
+and ("myhelper" in _callstack_)
+</code></pre>
+
+<p>
+This is not a new idea—conditional breakpoints have existed for decades—but
+treating this as the <em>primary</em> interaction model changes how debugging
+feels.
+</p>
+
+<h2>No debugger-specific language required</h2>
+
+<p>
+One important detail is that these conditions do not require a separate syntax
+or DSL. They can be expressed directly in the host language, using ordinary
+expressions and values that represent execution state.
+</p>
+
+<p>
+That makes the debugger feel less like a separate tool and more like an
+extension of the language runtime itself.
+</p>
+
+<h2>A small experiment</h2>
+
+<p>
+I explored this idea by building a small Python debugger where execution can be
+advanced by evaluating arbitrary Python expressions over the current execution
+state.
+</p>
+
+<p>
+The tool itself is not especially important. What mattered was the shift in how
+debugging felt: less like driving a machine step by step, and more like asking
+questions and waiting for them to become true.
+</p>
+
+<h2>If we were starting today</h2>
+
+<p>
+If debuggers were designed today, without historical constraints, it’s not
+obvious that stepping would be the central abstraction.
+</p>
+
+<p>
+We might instead start from describing program state, and treat time as an
+implementation detail rather than the primary interface.
+</p>
+
+<p>
+Stepping would still exist—but as one tool among many, not the foundation of
+the experience.
+</p>
+
+<hr>
+
+<p>
+If you’re curious, the prototype that motivated this essay lives here:
+<a href="https://github.com/hirsimaki-markus/seapie">GitHub</a>
+</p>
+
+</body>
+</html>

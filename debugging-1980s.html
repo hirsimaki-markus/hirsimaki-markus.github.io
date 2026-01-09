@@ -2,11 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>We Still Debug Like It’s the 1980s</title>
+  <title>We Still Debug Like It's the 1980s</title>
+  <style>
+    html {
+      filter: invert(1);
+      background: #fff;
+    }
+  </style>
 </head>
 <body>
 
-<h1>We Still Debug Like It’s the 1980s</h1>
+<p>
+    This page is intentionally minimal. I'm here to present an idea, not here to shove javascript down your throat.
+</p>
+
+<h1>We Still Debug Like It's the 1980s</h1>
 
 <p><em>
 What if debugging was querying execution instead of stepping through it?
@@ -46,16 +56,28 @@ Those constraints no longer apply.
 <h2>Most bugs are found by recognizing state, not time</h2>
 
 <p>
-In practice, bugs are rarely discovered by watching time pass. They’re
-discovered when a specific state appears:
+  In practice, bugs are rarely found by observing the passage of time.
+  They are found when execution violates an expectation - when the program
+  enters a state that should not exist.
+  </p>
+
+<p>
+The moment of interest is not “the next line”, but the first point where
+an invariant breaks:
 </p>
 
 <ul>
-  <li>a variable becomes <code>None</code></li>
-  <li>a function returns an unexpected value</li>
-  <li>execution reaches a place it shouldn’t</li>
-  <li>a call happens from the wrong context</li>
+  <li>a variable that was assumed to be initialized becomes <code>None</code></li>
+  <li>a function returns a value outside its expected domain</li>
+  <li>execution reaches a branch that was believed to be unreachable</li>
+  <li>a call occurs from an unexpected caller or context</li>
 </ul>
+
+<p>
+These are predicates over program state, not moments in time. Yet most
+debuggers force us to advance linearly through execution, hoping to
+notice the violation as it happens.
+</p>
 
 <p>
 When debugging, the question is rarely “what happens next?” It is usually
@@ -89,10 +111,6 @@ The second model is declarative. It describes a property of program state,
 independent of how many lines or frames it takes to get there.
 </p>
 
-<p>
-Most debuggers support only the first model.
-</p>
-
 <h2>What if debugging was querying execution?</h2>
 
 <p>
@@ -117,7 +135,7 @@ For example:
 </ul>
 
 <p>
-Expressed as a predicate over execution state, that might look like:
+Expressed as a predicate in Python style over execution state, that might look like:
 </p>
 
 <pre><code>
@@ -127,7 +145,7 @@ and ("myhelper" in _callstack_)
 </code></pre>
 
 <p>
-This is not a new idea—conditional breakpoints have existed for decades—but
+This is not a new idea - conditional breakpoints have existed for decades - but
 treating this as the <em>primary</em> interaction model changes how debugging
 feels.
 </p>
@@ -136,7 +154,7 @@ feels.
 
 <p>
 One important detail is that these conditions do not require a separate syntax
-or DSL. They can be expressed directly in the host language, using ordinary
+or DSL. They can be expressed directly for some languages (here, Python), using ordinary
 expressions and values that represent execution state.
 </p>
 
@@ -162,7 +180,7 @@ questions and waiting for them to become true.
 <h2>If we were starting today</h2>
 
 <p>
-If debuggers were designed today, without historical constraints, it’s not
+If debuggers were designed today, without historical constraints, it's not
 obvious that stepping would be the central abstraction.
 </p>
 
@@ -172,14 +190,14 @@ implementation detail rather than the primary interface.
 </p>
 
 <p>
-Stepping would still exist—but as one tool among many, not the foundation of
+Stepping would still exist-but as one tool among many, not the foundation of
 the experience.
 </p>
 
 <hr>
 
 <p>
-If you’re curious, the prototype that motivated this essay lives here:
+If you're curious, the prototype that motivated this essay/rant lives here:
 <a href="https://github.com/hirsimaki-markus/seapie">GitHub</a>
 </p>
 
